@@ -7,7 +7,7 @@ RedHat7离线部署开发环境
 |安装gcc的rpm包|安装gcc编译环境|
 |安装gcc-c++的rpm包| 安装gcc-c++环境|
 |安装redis的tar.gz包| 部署redis|
-|安装mysql的rpm包| 部署数据库（举例为`mysql`）|
+|安装mysql的rpm包| 部署数据库(举例为`mysql`)|
 |安装JDK的tar.gz包| 安装JDK|
 |安装tomcat的tar.gz包| 部署tomcat|
 |安装gitlab的rpm包| 部署gitlab|
@@ -15,7 +15,12 @@ RedHat7离线部署开发环境
 |安装maven的tar.gz包|部署Jenkins|
 |安装Jenkins的war包|部署Jenkins|
 |安装Jenkins插件的hpi包|部署Jenkins|
-
+|安装nodejs的源码tar.gz包|部署Onlyoffice(可选)|
+|安装postgresql的rpm包|部署Onlyoffice(可选)|
+|安装redis的tar.gz包|部署Onlyoffice(可选)|
+|安装erlang仓库的rpm包|部署Onlyoffice(可选)|
+|安装rabbitmq的rpm包|部署Onlyoffice(可选)|
+|安装fastdfs的依赖|部署fastdfs(可选)|
 # 环境准备
 
 查看redhat版本，去下载对应版本的rpm包
@@ -437,10 +442,12 @@ localhost:8080/jenkins/restart
 cat /root/.jenkins/secrets/initialAdminPassword
 ```
 
-访问`jenkins`服务，使用前的配置
+访问`jenkins`服务
 1. 将复制的随机密码输入，进入下一步
-2. 选择手动安装插件
-3. 
+2. 点击右上角的`X`，取消选择安装插件方式
+3. 创建第一个管理员用户
+4. 实例配置
+5. 开始使用
 
 安装配置**自动构建web项目**需要的依赖
 
@@ -473,19 +480,86 @@ mvn -v
 
 安装配置**自动构建web项目**需要的插件，[下载](http://updates.jenkins-ci.org/download/plugins/)与`jenkins.war`对应版本插件，这里全部下载最新
 
-插件清单
-```
-publish-over-ssh
+插件清单(必须)
 
-```
+|插件|依赖|
+|:-----------:|:---------:|
+|[publish-over-ssh](https://plugins.jenkins.io/publish-over-ssh)| [structs](https://plugins.jenkins.io/structs) [jdk-tool](https://plugins.jenkins.io/jdk-tool) [command-launcher](https://plugins.jenkins.io/command-launcher) [Script Security](https://plugins.jenkins.io/script-security) [publish-over](https://plugins.jenkins.io/publish-over) [bouncycastle API](https://plugins.jenkins.io/bouncycastle-api) [JSch dependency](https://plugins.jenkins.io/jsch) [SSH Credentials](https://plugins.jenkins.io/ssh-credentials) [Credentials](https://plugins.jenkins.io/credentials) | 
+|[git](https://plugins.jenkins.io/git)|[workflow-scm-step](https://plugins.jenkins.io/workflow-scm-step) [jdk-tool](https://plugins.jenkins.io/jdk-tool) [workflow-step-api](https://plugins.jenkins.io/workflow-step-api) [structs](https://plugins.jenkins.io/structs) [command-launcher](https://plugins.jenkins.io/command-launcher) [Script Security](https://plugins.jenkins.io/script-security) [Credentials](https://plugins.jenkins.io/credentials)  [bouncycastle API](https://plugins.jenkins.io/bouncycastle-api) [Git client](https://plugins.jenkins.io/git-client)  [Apache HttpComponents Client 4.x API](https://plugins.jenkins.io/apache-httpcomponents-client-4-api) [SSH Credentials](https://plugins.jenkins.io/ssh-credentials)  [JSch dependency](https://plugins.jenkins.io/jsch)  [SCM API](https://plugins.jenkins.io/scm-api)  [Mailer](https://plugins.jenkins.io/mailer)  [Display URL API](https://plugins.jenkins.io/display-url-api)  [Matrix Project](https://plugins.jenkins.io/matrix-project) [JUnit](https://plugins.jenkins.io/junit)  [workflow-api](https://plugins.jenkins.io/workflow-api) |
+|[gitlab](https://plugins.jenkins.io/gitlab-plugin)|[git](https://plugins.jenkins.io/git) [workflow-scm-step](https://plugins.jenkins.io/workflow-scm-step) [jdk-tool](https://plugins.jenkins.io/jdk-tool) [workflow-step-api](https://plugins.jenkins.io/workflow-step-api) [structs](https://plugins.jenkins.io/structs) [command-launcher](https://plugins.jenkins.io/command-launcher) [Script Security](https://plugins.jenkins.io/script-security) [Credentials](https://plugins.jenkins.io/credentials) [bouncycastle API](https://plugins.jenkins.io/bouncycastle-api) [Git client](https://plugins.jenkins.io/git-client) [Apache HttpComponents Client 4.x API](https://plugins.jenkins.io/apache-httpcomponents-client-4-api) [SSH Credentials](https://plugins.jenkins.io/ssh-credentials)  [JSch dependency](https://plugins.jenkins.io/jsch)  [SCM API](https://plugins.jenkins.io/scm-api)  [Mailer](https://plugins.jenkins.io/mailer) [Display URL API](https://plugins.jenkins.io/display-url-api)  [Matrix Project](https://plugins.jenkins.io/matrix-project) [JUnit](https://plugins.jenkins.io/junit)  [workflow-api](https://plugins.jenkins.io/workflow-api) [workflow-job](https://plugins.jenkins.io/workflow-job) [workflow-support](https://plugins.jenkins.io/workflow-support) |
 
-`jenkins`的系统配置
+插件清单(可选)
 
-`jenkins`的全局安全配置
+|插件|依赖|
+|:-----------:|:---------:|
+|[Credentials Binding](http://updates.jenkins-ci.org/download/plugins/credentials-binding/)|Credentials  Structs  JDK Tool  Command Agent Launcher  Script Security bouncycastle API  SSH Credentials  Pipeline: Step API  Plain Credentials |
+|[Workspace Cleanup]()|Pipeline: Nodes and Processes  Structs  JDK Tool  Command Agent Launcher  Script Security SCM API  bouncycastle API  Pipeline: Supporting APIs  Pipeline: Step API  Pipeline: API Durable Task  Matrix Project  JUnit  Resource Disposer |
+|[SSH Slaves]()|Credentials  Structs  JDK Tool  Command Agent Launcher  Script Security bouncycastle API  SSH Credentials |
+|[Mailer]()|Display URL API  JDK Tool  Command Agent Launcher  Script Security  bouncycastle API |
+|[SSH]()|JDK Tool  SSH Credentials  Credentials  Structs  Command Agent Launcher  Script Security bouncycastle API  JSch dependency |
 
-构建第一个`jenkins`工程
+进入`系统管理`的`插件管理`，切换`高级`tab页，在下面`上传插件`，上传上面`插件清单`的插件
 
-## 部署onlyoffice
-不属于开发必须项，不多阐述
-## 部署fastdfs
-不属于开发必须项，不多阐述
+安装顺序
+
+|顺序|插件|
+|:-----------:|:---------:|
+|1|structs.hpi|
+|2|jdk-tool.hpi|
+|3|script-security.hpi|
+|4|command-launcher.hpi|
+|5|publish-over.hpi|
+|6|bouncycastle-api.hpi|
+|7|credentials.hpi|
+|8|ssh-credentials.hpi|
+|9|jsch.hpi|
+|10|**publish-over-ssh.hpi**|
+|11|workflow-step-api.hpi|
+|12|workflow-scm-step.hpi|
+|13|apache-httpcomponents-client-4-api.hpi|
+|14|git-client.hpi|
+|15|scm-api.hpi|
+|16|display-url-api.hpi|
+|17|mailer.hpi|
+|18|workflow-api.hpi|
+|19|junit.hpi|
+|20|matrix-project.hpi|
+|21|**git.hpi**|
+|22|workflow-support.hpi|
+|23|workflow-job.hpi|
+|24|**gitlab-plugin.hpi**|
+
+
+在`系统管理`的`全局工具配置`，配置`Maven`、`JDK`、`Git`
+
+在`系统管理`的`系统设置`，配置`Gitlab`、`Git plugin`、`Publish over SSH`
+
+构建第一个`jenkins`工程，简单叙述下
+1. `源码管理`选择`git`
+2. `构建触发器`选择`Build when a change is pushed to GitLab. GitLab CI Service URL: xxxx`
+3. `构建`添加构建步骤，选择`调用顶层Maven目标`
+4. `构建后操作`选择`send build artifacts over ssh`
+
+**自动构建web项目**的最后一步配置：到`gitlab`配置`jenkins`工程的`WebHook`
+
+## 部署onlyoffice(可选)
+按照文档来，需要提前下载依赖项，如下
+
+|依赖|版本|
+|:-----------:|:---------:|
+| glibc | 1.17+ `iso里面有` |
+| gcc | 3.4.15+ `iso里面有` |
+| gcc-c++ | `iso里面有` |
+| python | 2.7+ `iso里面有` |
+| nodejs | [node-v8.14.0](http://nodejs.org/dist/latest-v8.x/)`6+ ~ 8` | 
+| mpfr | mpfr-3.1.1-4.el7.x86_64.rpm `iso里面有`|
+| postgresql | postgresql-9.1+.rpm `iso里面有`| 
+| redis | redis-4.X+.tar.gz`如上文所提下载` |
+| [erlang](https://www.erlang-solutions.com/resources/download.html)|erlang-19.0.4-1.el7.centos.x86_64.rpm|
+| [rabbitmq](https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_6) | rabbitmq-server-3.6.6-1.el7.noarch.rpm |
+
+提前下载即可，这里不多阐述
+
+## 部署fastdfs(可选)
+按照[官方](https://github.com/happyfish100/fastdfs/wiki)来，需要下载的提前下载即可，这里不多阐述
+>注：里面需要git clone的源码包，必须在linux环境下git clone才可编译
